@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="ThemeHouse_Models" title="[⌂] Models" version_string="1.0.0" version_id="1447261019" url="http://xf.themehouse.io/" install_callback_class="ThemeHouse_Install" install_callback_method="install" uninstall_callback_class="ThemeHouse_Install" uninstall_callback_method="uninstall">
+  <admin_navigation>
+    <navigation navigation_id="models" parent_navigation_id="addOnDevelopment" display_order="100" link="models" admin_permission_id="addOn" debug_only="0" hide_no_children="0"/>
+  </admin_navigation>
+  <admin_permissions/>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="th_model_add_models"><![CDATA[<xen:title>{xen:phrase th_create_new_model_models}</xen:title>
+	
+<xen:form action="{xen:adminlink 'models/save', $model, 'method={$method}'}" class="AutoValidator" data-redirect="yes">
+
+	<xen:textboxunit name="class" label="{xen:phrase th_class_name_models}:" value="" />
+
+	<xen:include template="helper_addon_unit" />
+
+	<xen:submitunit>
+		<input type="submit"  value="{xen:phrase save_changes}" accesskey="s" class="button primary"  />
+	</xen:submitunit>
+</xen:form>]]></template>
+    <template title="th_model_list_models"><![CDATA[<xen:title>{xen:phrase th_models_models}</xen:title>
+
+<xen:topctrl>
+	<a href="{xen:if {$xenOptions.th_models_enableAddOnChooser}, {xen:adminlink 'add-ons/models/add', {$addOns.{$addOnSelected}}}, {xen:adminlink 'models/add'}}" class="button">+ {xen:phrase th_create_new_model_models}</a>
+</xen:topctrl>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+
+<xen:if is="{$xenOptions.th_models_enableAddOnChooser}">
+	<div class="topChoosers">
+		<div class="Popup">
+			<span class="muted">{xen:phrase add_on}:</span> <a rel="Menu">{xen:if $addOnSelected, {$addOns.{$addOnSelected}.title}, '({xen:phrase unspecified})'}</a>
+			<div class="Menu">
+				<div class="primaryContent menuHeader"><h3>{xen:phrase add_on}</h3></div>
+				<ul class="secondaryContent blockLinksList">
+					<li><a href="{xen:adminlink 'add-ons/models'}">({xen:phrase unspecified})</a></li>
+					<xen:foreach loop="$addOns" value="$addOn">
+						<li><a href="{xen:adminlink 'add-ons/models', $addOn}">{$addOn.title}</a></li>
+					</xen:foreach>
+				</ul>
+			</div>
+		</div>
+	</div>
+</xen:if>
+
+<h2 class="subHeading">
+	<xen:include template="filter_list_controls" />
+	{xen:phrase th_models_models}
+</h2>
+
+<ul class="FilterList">
+	<xen:foreach loop="$addOns" value="$addOn">
+		<xen:if is="{$models.{$addOn.addon_id}}">
+			<li>
+				<h3 class="textHeading{xen:if '!{$addOn.active}', ' disabled'}">{$addOn.title}</h3>
+				<ol>
+				<xen:foreach loop="$models.{$addOn.addon_id}" value="$model">
+					<xen:listitem
+						id="{$model.class}"
+						href="{xen:adminlink 'models', $model}"
+						label="{$model.filename}"
+						labelclass="{xen:if '!{$addOn.active}', ' parentDisabled'}"
+						snippet="{$model.class}"
+						delete="{xen:adminlink 'models/delete', $model}" />
+				</xen:foreach>
+				</ol>
+			</li>
+		</xen:if>
+	</xen:foreach>
+</ul>
+
+<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:number $modelCount}</span>', 'total={xen:number $totalModels}'}</p>]]></template>
+    <template title="th_model_view_models"><![CDATA[<xen:title>{$model.class}</xen:title>
+
+<xen:topctrl>
+	<a href="{xen:adminlink 'models/add-method', $model}" class="button">+ {xen:phrase th_add_method_reflection}</a>
+</xen:topctrl>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+
+<h2 class="subHeading">
+	<xen:include template="filter_list_controls" />
+	{xen:phrase th_methods_reflection}
+</h2>
+
+<ul class="FilterList">
+	<li>
+		<ol>
+			<xen:foreach loop="$methods" key="$methodName" value="$method">
+				<xen:listitem
+					id="{$methodName}"
+					href="{xen:adminlink 'models/edit-method', $model, 'method={$methodName}'}"
+					label="{$methodName}"
+					snippet="{$method.declaringClass}"
+					delete="{xen:adminlink 'models/delete-method', $model, 'method={$methodName}'}" />
+			</xen:foreach>
+		</ol>
+	</li>
+</ul>
+
+<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:count $methods}</span>', 'total={xen:count $methods}'}</p>]]></template>
+  </admin_templates>
+  <admin_template_modifications/>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="controller_pre_dispatch" execute_order="10" callback_class="ThemeHouse_Listener_ControllerPreDispatch" callback_method="controllerPreDispatch" active="1" hint="" description=""/>
+    <listener event_id="file_health_check" execute_order="10" callback_class="ThemeHouse_Models_Listener_FileHealthCheck" callback_method="fileHealthCheck" active="1" hint="" description=""/>
+    <listener event_id="init_dependencies" execute_order="10" callback_class="ThemeHouse_Listener_InitDependencies" callback_method="initDependencies" active="1" hint="" description=""/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_Models_Listener_LoadClass" callback_method="loadClassRoutePrefix" active="0" hint="XenForo_Route_PrefixAdmin_AddOns" description="XenForo_Route_PrefixAdmin_AddOns (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class_route_prefix" execute_order="10" callback_class="ThemeHouse_Models_Listener_LoadClass" callback_method="loadClassRoutePrefix" active="1" hint="" description="(For XenForo 1.1 and below)" compatibility_switch="1"/>
+  </code_event_listeners>
+  <cron/>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups>
+    <group group_id="th_models" display_order="2000" debug_only="0"/>
+    <option option_id="th_dataWriters_enableAddOnChooser" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params/>
+      <sub_options/>
+      <relation group_id="th_dataWriters" display_order="1"/>
+    </option>
+    <option option_id="th_models_enableAddOnChooser" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params/>
+      <sub_options/>
+      <relation group_id="th_models" display_order="1"/>
+    </option>
+  </optiongroups>
+  <permissions>
+    <permission_groups/>
+    <permissions/>
+    <interface_groups/>
+  </permissions>
+  <phrases>
+    <phrase title="admin_navigation_models" version_id="1418748811" version_string="1.0.0"><![CDATA[List Models]]></phrase>
+    <phrase title="option_group_th_models" version_id="1418729470" version_string="1.0.0"><![CDATA[[⌂] Models]]></phrase>
+    <phrase title="option_group_th_models_description" version_id="1418729470" version_string="1.0.0"><![CDATA[Options for the [⌂] Models add-on.]]></phrase>
+    <phrase title="option_th_dataWriters_enableAddOnChooser" version_id="1418748811" version_string="1.0.0"><![CDATA[Enable Add-on Chooser]]></phrase>
+    <phrase title="option_th_dataWriters_enableAddOnChooser_explain" version_id="1418748811" version_string="1.0.0"><![CDATA[]]></phrase>
+    <phrase title="option_th_models_enableAddOnChooser" version_id="1418748811" version_string="1.0.0"><![CDATA[Enable Add-on Chooser]]></phrase>
+    <phrase title="option_th_models_enableAddOnChooser_explain" version_id="1418748811" version_string="1.0.0"><![CDATA[]]></phrase>
+    <phrase title="th_class_name_models" version_id="1418748811" version_string="1.0.0"><![CDATA[Class Name]]></phrase>
+    <phrase title="th_create_new_model_models" version_id="1418729470" version_string="1.0.0"><![CDATA[Create New Model]]></phrase>
+    <phrase title="th_models_models" version_id="1418729470" version_string="1.0.0"><![CDATA[Models]]></phrase>
+    <phrase title="th_model_models" version_id="1422552731" version_string="1.0.0"><![CDATA[Model]]></phrase>
+  </phrases>
+  <route_prefixes>
+    <route_type type="admin">
+      <prefix original_prefix="models" class="ThemeHouse_Models_Route_PrefixAdmin_Models" build_link="data_only"/>
+    </route_type>
+  </route_prefixes>
+  <style_properties/>
+  <templates/>
+  <public_template_modifications>
+    <modification template="footer" modification_key="th_copyrightNotice_models" description="Copyright notice for [⌂] Models" execution_order="1" enabled="1" action="callback">
+      <find><![CDATA[/{xen:phrase (?:xenforo|extra)_copyright}/]]></find>
+      <replace><![CDATA[ThemeHouse_Listener_InitDependencies::copyrightNotice]]></replace>
+    </modification>
+  </public_template_modifications>
+  <bb_code_media_sites/>
+  <bb_codes/>
+</addon>
